@@ -18,6 +18,65 @@ const authenticateToken = (req, res, next) => {
 
 router.use(authenticateToken);
 
+/**
+ * @swagger
+ * tags:
+ *   name: Challenges
+ *   description: Challenge management APIs
+ */
+
+/**
+ * @swagger
+ * /api/v1/challenges:
+ *   post:
+ *     summary: Create a new challenge
+ *     tags: [Challenges]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - goal
+ *               - plan
+ *             properties:
+ *               title:
+ *                 type: string
+ *               goal:
+ *                 type: string
+ *               plan:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Challenge created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Challenge'
+ *   get:
+ *     summary: List challenges
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: query
+ *         name: isComplete
+ *         schema:
+ *           type: boolean
+ *         description: Filter by completion status
+ *     responses:
+ *       200:
+ *         description: List of challenges
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 challenges:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Challenge'
+ */
 router.post('/', async (req, res) => {
     try {
         const { title, goal, plan } = req.body;
@@ -38,6 +97,28 @@ router.get('/', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/challenges/{id}:
+ *   get:
+ *     summary: Get challenge details
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Challenge details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Challenge'
+ *       404:
+ *         description: Challenge not found
+ */
 router.get('/:id', async (req, res) => {
     try {
         const result = await challengeService.getChallenge(req.user.userId, req.params.id);
@@ -47,6 +128,36 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/challenges/{id}/proof:
+ *   post:
+ *     summary: Upload proof for a challenge day
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - dayIndex
+ *               - imageBase64
+ *             properties:
+ *               dayIndex:
+ *                 type: integer
+ *               imageBase64:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Proof uploaded
+ */
 router.post('/:id/proof', async (req, res) => {
     try {
         const { dayIndex, imageBase64 } = req.body;
@@ -57,6 +168,22 @@ router.post('/:id/proof', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/challenges/{id}/reset:
+ *   post:
+ *     summary: Reset challenge progress
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Challenge reset
+ */
 router.post('/:id/reset', async (req, res) => {
     try {
         const result = await challengeService.resetChallenge(req.user.userId, req.params.id);
@@ -66,7 +193,24 @@ router.post('/:id/reset', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /api/v1/challenges/{id}/complete:
+ *   post:
+ *     summary: Mark challenge as complete
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Challenge completed
+ */
 router.post('/:id/complete', async (req, res) => {
+
     try {
         const result = await challengeService.completeChallenge(req.user.userId, req.params.id);
         res.json(result); // Response not strictly defined in plan, but returning status is good.
