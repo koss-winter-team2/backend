@@ -40,10 +40,11 @@ const listChallenges = async (userId, isComplete) => {
         challenges: challenges.map(c => ({
             challengeId: c._id,
             title: c.title,
+            category: c.category,
+            plan: c.plan,
             isComplete: c.isComplete,
             currentDay: c.currentDay,
             days: c.days,
-            category: c.category,
             createdAt: c.createdAt
         }))
     };
