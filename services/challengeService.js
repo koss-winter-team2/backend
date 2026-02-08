@@ -23,7 +23,8 @@ const createChallenge = async (userId, title, category, plan) => {
         plan,
         days: newChallenge.days,
         currentDay: newChallenge.currentDay,
-        isComplete: newChallenge.isComplete
+        isComplete: newChallenge.isComplete,
+        createdAt: newChallenge.createdAt
     };
 };
 
@@ -42,7 +43,8 @@ const listChallenges = async (userId, isComplete) => {
             isComplete: c.isComplete,
             currentDay: c.currentDay,
             days: c.days,
-            category: c.category
+            category: c.category,
+            createdAt: c.createdAt
         }))
     };
 };
@@ -63,7 +65,8 @@ const getChallenge = async (userId, challengeId) => {
         plan: challenge.plan,
         days: challenge.days,
         currentDay: challenge.currentDay,
-        isComplete: challenge.isComplete
+        isComplete: challenge.isComplete,
+        createdAt: challenge.createdAt
     };
 };
 
@@ -129,4 +132,35 @@ const completeChallenge = async (userId, challengeId) => {
     return { isComplete: true };
 };
 
-module.exports = { createChallenge, listChallenges, getChallenge, uploadProof, resetChallenge, completeChallenge };
+const getProof = async (userId, challengeId, dayIndex) => {
+    const db = getDB();
+    const challenge = await db.collection('challenges').findOne({
+        _id: new ObjectId(challengeId),
+        userId: new ObjectId(userId)
+    });
+
+    if (!challenge) throw new Error('Challenge not found');
+
+    const proof = challenge.proofs.find(p => p.dayIndex === parseInt(dayIndex));
+    if (!proof) throw new Error('Proof not found for this day');
+
+    return {
+        dayIndex: proof.dayIndex,
+        imageBase64: proof.imageBase64,
+        uploadedAt: proof.uploadedAt
+    };
+};
+
+const deleteChallenge = async (userId, challengeId) => {
+    const db = getDB();
+    const result = await db.collection('challenges').deleteOne({
+        _id: new ObjectId(challengeId),
+        userId: new ObjectId(userId)
+    });
+
+    if (result.deletedCount === 0) throw new Error('Challenge not found');
+
+    return { message: 'Challenge deleted successfully' };
+};
+
+module.exports = { createChallenge, listChallenges, getChallenge, uploadProof, resetChallenge, completeChallenge, getProof, deleteChallenge };

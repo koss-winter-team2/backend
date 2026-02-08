@@ -39,12 +39,12 @@ router.use(authenticateToken);
  *             type: object
  *             required:
  *               - title
- *               - goal
+ *               - category
  *               - plan
  *             properties:
  *               title:
  *                 type: string
- *               goal:
+ *               category:
  *                 type: string
  *               plan:
  *                 type: string
@@ -79,8 +79,8 @@ router.use(authenticateToken);
  */
 router.post('/', async (req, res) => {
     try {
-        const { title, goal, plan } = req.body;
-        const result = await challengeService.createChallenge(req.user.userId, title, goal, plan);
+        const { title, category, plan } = req.body;
+        const result = await challengeService.createChallenge(req.user.userId, title, category, plan);
         res.status(201).json(result);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -216,6 +216,87 @@ router.post('/:id/complete', async (req, res) => {
         res.json(result); // Response not strictly defined in plan, but returning status is good.
     } catch (err) {
         res.status(400).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/v1/challenges/{id}/proof/{dayIndex}:
+ *   get:
+ *     summary: Get uploaded proof photo for a specific day
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Challenge ID
+ *       - in: path
+ *         name: dayIndex
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Day index (0, 1, or 2)
+ *     responses:
+ *       200:
+ *         description: Proof photo retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 dayIndex:
+ *                   type: integer
+ *                 imageBase64:
+ *                   type: string
+ *                 uploadedAt:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: Proof not found
+ */
+router.get('/:id/proof/:dayIndex', async (req, res) => {
+    try {
+        const result = await challengeService.getProof(req.user.userId, req.params.id, req.params.dayIndex);
+        res.json(result);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/v1/challenges/{id}:
+ *   delete:
+ *     summary: Delete a challenge
+ *     tags: [Challenges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Challenge ID
+ *     responses:
+ *       200:
+ *         description: Challenge deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Challenge not found
+ */
+router.delete('/:id', async (req, res) => {
+    try {
+        const result = await challengeService.deleteChallenge(req.user.userId, req.params.id);
+        res.json(result);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
     }
 });
 

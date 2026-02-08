@@ -46,7 +46,8 @@ const options = {
                             items: { type: 'boolean' }
                         },
                         currentDay: { type: 'integer' },
-                        isComplete: { type: 'boolean' }
+                        isComplete: { type: 'boolean' },
+                        createdAt: { type: 'string', format: 'date-time' }
                     }
                 }
             }
