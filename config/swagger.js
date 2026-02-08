@@ -10,12 +10,12 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
-                description: 'Local server',
-            },
-            {
                 url: 'https://backend-r08l.onrender.com',
                 description: 'Render Production Server',
+            },
+            {
+                url: 'http://localhost:3000',
+                description: 'Local server',
             },
         ],
         components: {
