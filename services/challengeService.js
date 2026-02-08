@@ -1,12 +1,12 @@
 const { getDB } = require('../config/db');
 const { ObjectId } = require('mongodb');
 
-const createChallenge = async (userId, title, goal, plan) => {
+const createChallenge = async (userId, title, category, plan) => {
     const db = getDB();
     const newChallenge = {
         userId: new ObjectId(userId),
         title,
-        goal,
+        category,
         plan,
         days: [false, false, false],
         currentDay: 0,
@@ -18,9 +18,12 @@ const createChallenge = async (userId, title, goal, plan) => {
     const result = await db.collection('challenges').insertOne(newChallenge);
     return {
         challengeId: result.insertedId,
-        goal,
+        title,
+        category,
+        plan,
         days: newChallenge.days,
-        currentDay: newChallenge.currentDay
+        currentDay: newChallenge.currentDay,
+        isComplete: newChallenge.isComplete
     };
 };
 
@@ -38,7 +41,8 @@ const listChallenges = async (userId, isComplete) => {
             title: c.title,
             isComplete: c.isComplete,
             currentDay: c.currentDay,
-            days: c.days
+            days: c.days,
+            category: c.category
         }))
     };
 };
@@ -54,9 +58,12 @@ const getChallenge = async (userId, challengeId) => {
 
     return {
         challengeId: challenge._id,
-        goal: challenge.goal,
+        title: challenge.title,
+        category: challenge.category,
+        plan: challenge.plan,
         days: challenge.days,
-        currentDay: challenge.currentDay
+        currentDay: challenge.currentDay,
+        isComplete: challenge.isComplete
     };
 };
 

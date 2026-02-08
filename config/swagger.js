@@ -13,6 +13,10 @@ const options = {
                 url: 'http://localhost:3000',
                 description: 'Local server',
             },
+            {
+                url: 'https://backend-r08l.onrender.com',
+                description: 'Render Production Server',
+            },
         ],
         components: {
             securitySchemes: {
@@ -35,7 +39,7 @@ const options = {
                     properties: {
                         challengeId: { type: 'string' },
                         title: { type: 'string' },
-                        goal: { type: 'string' },
+                        category: { type: 'string' },
                         plan: { type: 'string' },
                         days: {
                             type: 'array',
